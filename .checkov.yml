@@ -1,0 +1,6 @@
+framework: terraform
+quiet: true
+compact: true
+skip-framework:
+  - secrets
+soft-fail: false

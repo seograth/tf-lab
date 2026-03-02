@@ -1,0 +1,69 @@
+name: terraform-ci
+
+on:
+  pull_request:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    services:
+      localstack:
+        image: localstack/localstack:latest
+        ports:
+          - 4566:4566
+        env:
+          SERVICES: s3,sts
+          DEBUG: "0"
+          AWS_DEFAULT_REGION: us-east-1
+        options: >-
+          --health-cmd "bash -lc 'curl -sf http://localhost:4566/_localstack/health | grep -q running'"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v30
+        with:
+          nix_path: nixpkgs=channel:nixos-24.05
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      # Optional but recommended: faster builds
+      - name: Nix flake check (optional)
+        run: nix flake show
+
+      - name: Enter dev shell and run CI gates
+        env:
+          # Keep tests pinned to LocalStack and prevent accidental real AWS calls
+          AWS_ACCESS_KEY_ID: test
+          AWS_SECRET_ACCESS_KEY: test
+          AWS_DEFAULT_REGION: us-east-1
+        run: |
+          nix develop --command bash -lc '
+            set -euo pipefail
+
+            # Format check
+            task fmt:check
+
+            # Static lint
+            task tflint
+
+            # Security gate
+            task checkov
+
+            # Plan -> JSON
+            task dev:planjson
+
+            # Policy gate
+            task conftest
+
+            # Behavioral tests (LocalStack)
+            task terratest
+          '

@@ -1,0 +1,47 @@
+# ----------------------------
+# Terraform / OpenTofu
+# ----------------------------
+**/.terraform/*
+**/tfplan.binary
+**/tfplan.json
+*.tfstate
+*.tfstate.*
+crash.log
+
+# Keep provider lock file committed (important for reproducibility)
+# If you want to commit it, remove the line above for .terraform.lock.hcl
+
+# ----------------------------
+# LocalStack
+# ----------------------------
+.localstack/
+
+# ----------------------------
+# Checkov
+# ----------------------------
+.checkov.json
+
+# ----------------------------
+# Go
+# ----------------------------
+/bin/
+/coverage.out
+*.test
+
+# ----------------------------
+# Nix
+# ----------------------------
+result
+.direnv/
+
+# ----------------------------
+# macOS / editors
+# ----------------------------
+.DS_Store
+.idea/
+.vscode/
+
+# ----------------------------
+# AWS credentials (never commit)
+# ----------------------------
+.aws/
