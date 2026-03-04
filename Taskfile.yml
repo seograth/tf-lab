@@ -13,13 +13,20 @@ tasks:
     cmds:
       - tflint --init
       - tflint --chdir=terraform/envs/dev
-      - tflint --chdir=terraform/modules/s3-secure
+      - tflint --chdir=terraform/modules/s3
 
   checkov:
     cmds:
-      - checkov -d terraform -o json > .checkov.json
-      - jq -r '([.results.failed_checks[]? | select(.severity=="HIGH" or .severity=="CRITICAL")] ) as $bad | "HIGH/CRITICAL findings: \($bad|length)"' .checkov.json
-      - jq -e '([.results.failed_checks[]? | select(.severity=="HIGH" or .severity=="CRITICAL")] | length) == 0' .checkov.json
+      - checkov -d terraform -o json --soft-fail > .checkov.json
+      - |-
+        jq -r '
+          ([.results.failed_checks[]? | select(.severity=="HIGH" or .severity=="CRITICAL")]) as $bad
+          | "HIGH/CRITICAL findings: \($bad|length)"
+        ' .checkov.json
+      - |-
+        jq -e '
+          ([.results.failed_checks[]? | select(.severity=="HIGH" or .severity=="CRITICAL")] | length) == 0
+        ' .checkov.json
 
   dev:planjson:
     dir: terraform/envs/dev

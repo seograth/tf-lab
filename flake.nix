@@ -30,8 +30,21 @@
           ];
 
           shellHook = ''
-            echo "Terraform Secure Dev Environment Ready"
+            echo "Check tool versions!"
             tofu version
+            go version
+            checkov --version
+            conftest --version
+            git --version
+            aws --version
+            docker --version || echo "Docker not available or requires sudo"
+            act --version
+            driftctl version
+
+            if [ -f .env.localstack ]; then
+              source .env.localstack
+            fi
+            echo "Dev shell ready"
           '';
         };
       });

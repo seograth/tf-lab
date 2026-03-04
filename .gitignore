@@ -45,3 +45,4 @@ result
 # AWS credentials (never commit)
 # ----------------------------
 .aws/
+.env*

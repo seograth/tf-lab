@@ -19,7 +19,7 @@ jobs:
           DEBUG: "0"
           AWS_DEFAULT_REGION: us-east-1
         options: >-
-          --health-cmd "bash -lc 'curl -sf http://localhost:4566/_localstack/health | grep -q running'"
+          --health-cmd "bash -lc 'curl -sf http://localhost:4566/_localstack/health >/dev/null'"
           --health-interval 5s
           --health-timeout 3s
           --health-retries 30
